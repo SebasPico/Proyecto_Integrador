@@ -98,7 +98,13 @@ export default function LoginForm() {
       storage.setItem("auth_token", data.token || "demo-token");
       storage.setItem("auth_user", JSON.stringify(data.user));
 
-      router.push("/dashboard");
+      const roleRedirect = {
+        administrador: "/administrador",
+        productor: "/productor",
+        "asistente-tecnico": "/asistente-tecnico",
+      };
+
+      router.push(data.redirectTo || roleRedirect[data?.user?.role] || "/dashboard");
     } catch {
       setServerError("Error de conexion. Intenta nuevamente.");
     } finally {
@@ -175,7 +181,7 @@ export default function LoginForm() {
       </Button>
 
       <p className="text-center text-xs text-slate-500">
-        Demo: ejemplo@empresa.com / Password123*
+        Demo Admin: admin@agrocontrol.com / Admin2026*
       </p>
     </form>
   );

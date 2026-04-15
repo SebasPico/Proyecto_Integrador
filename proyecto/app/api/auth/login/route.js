@@ -1,10 +1,16 @@
 import { NextResponse } from "next/server";
 
-const DEMO_USER = {
-  email: "ejemplo@empresa.com",
-  password: "Password123*",
-  name: "Admin Demo",
-};
+const AUTH_MICROSERVICE = "ms-auth";
+
+const USERS = [
+  {
+    email: "admin@agrocontrol.com",
+    password: "Admin2026*",
+    name: "Administrador General",
+    role: "administrador",
+    redirectTo: "/administrador",
+  },
+];
 
 export async function POST(request) {
   const { email, password } = await request.json();
@@ -15,26 +21,34 @@ export async function POST(request) {
 
   if (!email || !password) {
     return NextResponse.json(
-      { message: "Debes completar correo y contrasena." },
+      {
+        message: "Debes completar correo y contrasena.",
+        service: AUTH_MICROSERVICE,
+      },
       { status: 400 },
     );
   }
 
-  if (email !== DEMO_USER.email) {
+  const user = USERS.find((item) => item.email === email);
+
+  if (!user) {
     return NextResponse.json({ message: "Correo invalido" }, { status: 401 });
   }
 
-  if (password !== DEMO_USER.password) {
+  if (password !== user.password) {
     return NextResponse.json({ message: "Contrasena incorrecta" }, { status: 401 });
   }
 
   return NextResponse.json(
     {
       message: "Login exitoso",
-      token: "demo-jwt-token",
+      token: `demo-jwt-token-${user.role}`,
+      service: AUTH_MICROSERVICE,
+      redirectTo: user.redirectTo,
       user: {
-        email: DEMO_USER.email,
-        name: DEMO_USER.name,
+        email: user.email,
+        name: user.name,
+        role: user.role,
       },
     },
     { status: 200 },
